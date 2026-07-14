@@ -41,14 +41,14 @@ jobs:
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
           RUNNER_TEMP: ${{ runner.temp }}
-        run: flutter build appbundle --release
+        run: flutter build appbundle --release --build-number=${{ github.run_number }}
 
       # Push the bundle directly to the Google Play Developer Console
       - name: Upload to Google Play
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_JSON_KEY }}
-          packageName: 'com.example.blue_cat_studio'
+          packageName: 'com.shroomfall.dashboard'
           releaseFiles: blue_cat_studio/build/app/outputs/bundle/release/app-release.aab
           track: 'internal'
           status: 'completed'
