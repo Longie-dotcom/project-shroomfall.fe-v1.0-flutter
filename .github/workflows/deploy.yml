@@ -47,9 +47,8 @@ jobs:
       - name: Upload to Google Play
         uses: r0adkll/upload-google-play@v1
         with:
-          service_account_json_raw: ${{ secrets.GOOGLE_PLAY_JSON_KEY }}
-          package_name: 'com.example.blue_cat_studio'
-          # Updated path below to look inside the subfolder
-          release_files: blue_cat_studio/build/app/outputs/bundle/release/app-release.aab
+          serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_JSON_KEY }}
+          packageName: 'com.example.blue_cat_studio'
+          releaseFiles: blue_cat_studio/build/app/outputs/bundle/release/app-release.aab
           track: 'internal'
           status: 'completed'
