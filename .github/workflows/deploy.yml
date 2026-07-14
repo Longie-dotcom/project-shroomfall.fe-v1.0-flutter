@@ -23,9 +23,9 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
-          # flutter-version: '3.x.x' # Optional: Specify your exact version if needed
 
       - name: Install Dependencies
+        working-directory: blue_cat_studio # <-- Tells Flutter where to look
         run: flutter pub get
 
       # Safely decode our keystore string into a temporary secure location on the runner
@@ -35,6 +35,7 @@ jobs:
 
       # Build the signed release Android App Bundle (.aab)
       - name: Build Android App Bundle
+        working-directory: blue_cat_studio # <-- Tells Flutter where to look
         env:
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
@@ -48,6 +49,7 @@ jobs:
         with:
           service_account_json_raw: ${{ secrets.GOOGLE_PLAY_JSON_KEY }}
           package_name: 'com.example.blue_cat_studio'
-          release_files: build/app/outputs/bundle/release/app-release.aab
-          track: 'internal' # Keeps it on the Internal Testing track for absolute safety
+          # Updated path below to look inside the subfolder
+          release_files: blue_cat_studio/build/app/outputs/bundle/release/app-release.aab
+          track: 'internal'
           status: 'completed'
