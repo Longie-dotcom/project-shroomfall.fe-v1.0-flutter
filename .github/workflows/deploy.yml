@@ -1,0 +1,53 @@
+name: CI/CD Google Play Deploy (Flutter)
+
+on:
+  push:
+    branches:
+      - main  # Triggers whenever you push changes to your main branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Java Development Kit (JDK)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Set up Flutter SDK
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          # flutter-version: '3.x.x' # Optional: Specify your exact version if needed
+
+      - name: Install Dependencies
+        run: flutter pub get
+
+      # Safely decode our keystore string into a temporary secure location on the runner
+      - name: Decrypt Android Keystore
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > ${{ runner.temp }}/upload-keystore.jks
+
+      # Build the signed release Android App Bundle (.aab)
+      - name: Build Android App Bundle
+        env:
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: flutter build appbundle --release
+
+      # Push the bundle directly to the Google Play Developer Console
+      - name: Upload to Google Play
+        uses: r0adkll/upload-google-play@v1
+        with:
+          service_account_json_raw: ${{ secrets.GOOGLE_PLAY_JSON_KEY }}
+          package_name: 'com.example.blue_cat_studio'
+          release_files: build/app/outputs/bundle/release/app-release.aab
+          track: 'internal' # Keeps it on the Internal Testing track for absolute safety
+          status: 'completed'

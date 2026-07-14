@@ -5,6 +5,13 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+// Load local keystore properties for local building if available
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.file('key.properties')
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
 android {
     namespace = "com.example.blue_cat_studio"
     compileSdk = flutter.compileSdkVersion
@@ -17,6 +24,23 @@ android {
 
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_17.toString()
+    }
+
+    signingConfigs {
+        release {
+            // Checks if running on GitHub Actions environment variables, else looks for local key.properties
+            if (System.getenv("ANDROID_KEYSTORE_PASSWORD") != null) {
+                storeFile = file("${System.getenv("RUNNER_TEMP")}/upload-keystore.jks")
+                storePassword = System.getenv("ANDROID_KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("ANDROID_KEY_ALIAS")
+                keyPassword = System.getenv("ANDROID_KEY_PASSWORD")
+            } else if (keystoreProperties['storeFile']) {
+                storeFile = file(keystoreProperties['storeFile'])
+                storePassword = keystoreProperties['storePassword']
+                keyAlias = keystoreProperties['keyAlias']
+                keyPassword = keystoreProperties['keyPassword']
+            }
+        }
     }
 
     defaultConfig {
@@ -32,9 +56,8 @@ android {
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            // Updated to use the release signing config specified above
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 }
