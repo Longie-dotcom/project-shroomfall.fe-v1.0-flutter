@@ -1,70 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:blue_cat_studio/features/auth/presentation/login_screen.dart';
 
 void main() {
-  runApp(const MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(const BlueCatStudioApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class BlueCatStudioApp extends StatelessWidget {
+  const BlueCatStudioApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      title: 'Blue Cat Studio Admin',
       debugShowCheckedModeBanner: false,
-      title: 'Blue Cat Studio',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.indigo,
-        ),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
       ),
-      home: const HomePage(),
-    );
-  }
-}
+      // Set your initial screen here
+      home: const LoginScreen(),
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
-
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-  bool isDark = false;
-  double size = 120;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: isDark ? Colors.black : Colors.white,
-      appBar: AppBar(
-        title: const Text("Blue Cat Studio"),
-      ),
-      body: Center(
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
-          width: size,
-          height: size,
-          decoration: BoxDecoration(
-            color: isDark ? Colors.orange : Colors.blue,
-            borderRadius: BorderRadius.circular(isDark ? 60 : 12),
-          ),
-          child: const Icon(
-            Icons.pets,
-            color: Colors.white,
-            size: 60,
-          ),
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          setState(() {
-            isDark = !isDark;
-            size = size == 120 ? 180 : 120;
-          });
-        },
-        child: const Icon(Icons.refresh),
-      ),
+      // Optional: Define named routes if you plan to navigate elsewhere later
+      routes: {
+        // '/dashboard': (context) => const AdminDashboardScreen(),
+      },
     );
   }
 }
